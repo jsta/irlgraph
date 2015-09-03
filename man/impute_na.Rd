@@ -6,6 +6,17 @@
 \usage{
 impute_na(csurf, cells, nullcells, result, cellcoords)
 }
+\arguments{
+\item{csurf}{}
+
+\item{cells}{}
+
+\item{nullcells}{}
+
+\item{result}{}
+
+\item{cellcoords}{}
+}
 \description{
 Impute NA cells according to nearest neighbor
 }

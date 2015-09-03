@@ -6,6 +6,13 @@
 \usage{
 get_path(egraph2, snode, csurf)
 }
+\arguments{
+\item{egraph2}{}
+
+\item{snode}{}
+
+\item{csurf}{}
+}
 \description{
 Generate a shortest path raster from a specific graph node
 }
