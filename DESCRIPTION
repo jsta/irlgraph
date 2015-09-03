@@ -6,3 +6,4 @@ Author: Joseph Stachelek
 Maintainer: Joseph Stachelek <jstachel@sfwmd.gov>
 Description: Create irregular landscape graphs following Etherington 2012
 License: GPL
+Imports: deldir, igraph, Matrix, sp, raster, spatstat
