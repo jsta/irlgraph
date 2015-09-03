@@ -1,6 +1,16 @@
 # library(sp)
-# library(tripack)
+# library(raster)
+# library(deldir)
 # library(igraph)
+# library(spatstat)
+
+dm<-matrix(c( 1,  1,  1,  1,  1,
+            NA, NA, NA, NA, 1, 
+            1,  1,  1,  1,  1,  
+            1,  1,  1,  1,  1,  
+            1,  1,  1,  1,  1  
+            ), ncol = 5, byrow = TRUE)
+
 
 dm<-as.matrix(read.delim("inst/extdata/etherington20120code/cost-surface20x20.txt",skip = 6, na.strings = "-9999", header = FALSE, sep = " "))
 
@@ -31,6 +41,7 @@ irgraph<-function(dm){
     limitcells<-c(raster::cellFromRow(csurf,c(1,ymax)),raster::cellFromCol(csurf,c(1,xmax)))
     limitcells<-limitcells[!(limitcells %in% nullcells)]
     limitcells<-c(limitcells,which(raster::extract(raster::boundaries(csurf),allcells[,1:2])==1))
+    limitcells<-limitcells[!duplicated(limitcells)]
     
     vipcells<-which(raster::extract(raster::boundaries(csurf,classes = TRUE, type="outer"),allcells[,1:2])==1)
     vipcells<-vipcells[!(vipcells %in% limitcells)]
@@ -50,7 +61,7 @@ irgraph<-function(dm){
     cells<-cells[!duplicated(cells)]
     cells<-cells[order(cells)]
     
-    return(list(cells =cells, nullcells = nullcells))
+    return(list(cells =cells, nullcells = nullcells, limitcells = limitcells))
   }
   
   cells<-get_cells(dm,grainprop = 0.25)
@@ -59,48 +70,50 @@ irgraph<-function(dm){
   cells<-cells$cells
   cellcoords<-raster::xyFromCell(csurf,cells)[,1:2]
   allcells<-c(cells,nullcells)
+  allcells<-allcells[order(allcells)]
   allcoords<-rbind(cellcoords,nullcoords)
+  allcoords<-allcoords[order(-allcoords[,2], allcoords[,1]),]
   
-  #create graph======================================================#
+  #create graph====================================================#
   create_tri<-function(cellcoords){
-    cellcoords[2,2]<-cellcoords[2,2] + 0.01 #avoids jitter error
-    tripack::tri.mesh(cellcoords[,1],cellcoords[,2])
+    #cellcoords<-allcoords
+    deldir::deldir(cellcoords[,1], cellcoords[,2])
   }
   
   dtri<-create_tri(allcoords)
   
+  
   #create adjacency matrix===========================================#
   
   create_adjmat<-function(dtri,cells){
-    #code block adapted from stackoverflow (search term: how can i extract distance between the points after a delaunay triangulation with deldir in R?)
-    dneigh<-tripack::neighbours(dtri)
-    orig<-allcells[rep(c(1:length(dneigh)), sapply(dneigh, length))]
-    neigh<-allcells[unlist(dneigh)]
+    orig<-allcells[dtri$delsgs[,5]]
+    neigh<-allcells[dtri$delsgs[,6]]
     keep<-!(orig %in% nullcells) & !(neigh %in% nullcells)
     
     orig<-orig[keep]
     neigh<-neigh[keep]
     elist<-cbind(orig, neigh)
     
-    if(length(unique(elist[,1]))!=length(cells)){
-      warning("Mismatch between edgelist and nonnull cells")
-    }
+    #if(length(unique(elist[,1]))!=length(cells)){
+    #  warning("Mismatch between edgelist and nonnull cells")
+    #}
     
     datavals<-cbind(raster::getValues(csurf)[elist[,1]], raster::getValues(csurf)[elist[,2]])
     datavals<-apply(datavals, 1, function(x) mean(x, na.rm = TRUE))
     
     adjmat<-Matrix::Matrix(0, nrow = raster::ncell(csurf), ncol =  raster::ncell(csurf))
     adjmat[elist]<-as.vector(1/datavals)
-    adjmat<-Matrix::forceSymmetric(adjmat)
+    #adjmat<-Matrix::forceSymmetric(adjmat)
+    #as(adjmat, "symmetricMatrix")
     adjmat
   }
   
   adjmat<-create_adjmat(dtri,cells)
   
   #egraph2<-igraph::graph.adjacency(adjmat, mode = "directed", weighted = TRUE)
-  egraph2<-igraph::graph.adjacency(adjmat, mode = "undirected", weighted = TRUE)
+  egraph2<-igraph::graph.adjacency(adjmat, mode = "directed", weighted = TRUE)
   igraph::E(egraph2)$weight <- 1/igraph::E(egraph2)$weight 
-  egraph2
+  list(cells = cells, cellcoords = cellcoords, nullcells = nullcells, egraph2 = egraph2)
 }
 
 egraph2<-irgraph(dm=dm)
@@ -108,6 +121,9 @@ egraph2<-irgraph(dm=dm)
 #calc from specific origin=========================================#
 #spaths<-igraph::shortest.paths(egraph2, v = 118)
 get_path<-function(egraph2, snode, csurf){
+  
+    #CHECK TO MAKE SURE SNODE EXISTS IN GRID!!!
+  
   spaths<-igraph::shortest.paths(egraph2, v = snode)#171
   #igraph::shortest.paths(egraph2, v = 2, to = 9)
   
@@ -116,10 +132,11 @@ get_path<-function(egraph2, snode, csurf){
   result[]<-spaths
   result
 }
-result<-get_path(egraph2, 2, csurf)
+result<-get_path(egraph2$egraph2, 171, csurf)
+
 
 #imputation========================================================#
-impute_na<-function(csurf, cells, result, cellcoords){
+impute_na<-function(csurf, cells, nullcells, result, cellcoords){
   nonnullcells<-(1:length(csurf))[!(1:length(csurf) %in% cells)]
   nonnullcells<-nonnullcells[!(nonnullcells %in% nullcells)]
   
@@ -130,7 +147,8 @@ impute_na<-function(csurf, cells, result, cellcoords){
   result
 }
 
-sp::plot(impute_na(csurf, cells, result, cellcoords))
+sp::plot(impute_na(csurf, egraph2$cells, egraph2$nullcells, result, egraph2$cellcoords))
+points(raster::xyFromCell(csurf,191))
 #==================================================================#
 
 # sp::plot(csurf)
