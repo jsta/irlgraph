@@ -1,0 +1,114 @@
+---
+title: "Generate Accumulated Cost Surfaces with Irregular Landscape Graphs"
+author: "Joseph Stachelek"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+bibliography: irlgraph.bib
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteIndexEntry{Generate Accumulated Cost Surfaces with Irregular Landscape Graphs}
+---
+
+This vignette describes how to generate irregular landscape graphs in order to produce accumulated cost surfaces. Accumulated cost surfaces generated in this manner have several benefits as detailed by @etherington2012. Most notably, there is a large decrease in processing speed relative to regular graphs. There may be even larger decreases in processing speed relative to straight implementations of Dijkstra's algorithm (see @gdistance).
+
+##Installation
+
+Currently the `ilgraph` package can only be installed by compiling from source. One easy way to compile `R` packages is to use the `devtools` package [@devtools]. Eventually, `ilgraph` may be submitted to CRAN where compiled binaries would be made available ( [http://cran.r-project.org](http://cran.r-project.org)).
+
+```{r echo=FALSE, eval=FALSE}
+devtools::install_github("jsta/ilgraph")
+```
+
+##Generating Irregular Landscape Graphs
+
+The @etherington2012 method of constructing irregular landscape graphs involves selecting a subset of points contained in the analysis domain. These subsets include:
+
+1. Points of Interest
+
+Optional points supplied to the `poicoords` argument of the `ir_graph` function.
+
+2. Very important point cells
+
+Cells that lie on either side of a boundary between different cost-categories in the underlying cost raster.
+
+3. Landscape limit cells
+
+Cells on the boundary of null data cells and the cost raster extent.
+
+4. Ecological grain cells
+
+A randomly selected number of cells. The proportion of cells selected in this manner is supplied to the `grainprop` argument of the `irl_graph` function.
+
+5. Null data cells
+
+&nbsp;
+
+&nbsp;
+
+The following code block loads the cost raster from @etherington2012 and calls the `irl_graph` function to generate an irregular landscape graph. Next, a sequence of plotting commands are called in order to visualize the point subsets in relation to the cost raster.
+
+```{r eval=TRUE, fig.align='center', fig.height=4, fig.width=6}
+library(irlgraph)
+library(raster, quietly = TRUE)
+
+set.seed(123) #make reproducible
+
+dm <- as.matrix(read.delim(system.file("extdata/etherington20120code/cost-surface20x20.txt", package = "irlgraph"), skip = 6, na.strings = "-9999", header = FALSE, sep = " "))
+
+costsurf <- raster::raster(nrows=dim(dm)[1],ncols=dim(dm)[2],resolution=1,xmn=0,
+xmx = dim(dm)[1], ymn = 0, ymx = dim(dm)[2])
+costsurf[] <- dm
+
+par(mar = c(0,0,3,0))
+plot(costsurf, box = FALSE, axes = FALSE)
+
+poicoords <- matrix(c(10.5, 10.5), ncol = 2)
+graph <- irl_graph(dm = dm, poicoords)
+
+legend("top", inset  = c(0, -0.2), legend = c("Points of interest", "Very important",
+"Landscape limit"), col = viridis::viridis(5)[1:3], pch = 1 , horiz = TRUE,
+xpd = TRUE, cex = 0.7, bty = "n")
+
+legend("top", inset  = c(0, -0.1), legend = c("Null data", "Ecological grain"),
+col = viridis::viridis(5)[4:5], pch = 1, horiz = TRUE, xpd = TRUE, cex = 0.7, bty = "n")
+
+points(xyFromCell(costsurf, graph$poicells), col = viridis::viridis(5)[1])
+points(xyFromCell(costsurf, graph$vipcells), col = viridis::viridis(5)[2])
+points(xyFromCell(costsurf, graph$limitcells), col = viridis::viridis(5)[3])
+points(xyFromCell(costsurf, graph$nullcells), col = viridis::viridis(5)[4])
+points(xyFromCell(costsurf, graph$graincells), col = viridis::viridis(5)[5])
+
+```
+
+The underlying graph can be visualized with the following call to the `plot` command. This preliminary graph includes edge connections to null cell nodes. Note that these nodes and any edge connections to these cells are stripped in the code underlying the `ir_graph` function before the final graph is constructed.
+
+```{r eval=TRUE, fig.height=4, fig.width=6, fig.align='center'}
+par(mar=c(2,0,0,0))
+plot(graph$tri, wlines = "triang", xlab = "", ylab = "", showrect = FALSE, pch = 7)
+```
+
+##Generating Accumulated Cost Surfaces
+
+Partial accumlated cost surfaces can be generated from an irregular landscape graph by specifying a starting node to the `snode` or `scoord` arguments of the `get_path` function. 
+
+```{r eval=TRUE, fig.align='center', fig.height=4, fig.width=6}
+result<-acc_path(graph$graph, scoord = c(10.5, 10.5), costsurf = costsurf)
+
+par(mar=c(0,0,3,0))
+plot(result, box = FALSE, axes = FALSE)
+points(10.5, 10.5)
+```
+
+These partial surfaces can be converted to complete accumulated cost surfaces by using the `impute_na` function to perform nearest neighbor interpolation.
+
+```{r eval=TRUE, fig.align='center', fig.height=4, fig.width=6}
+result <- impute_na(costsurf, graph$cells, graph$nullcells, result, graph$cellcoords)
+
+par(mar=c(0,0,3,0))
+plot(result, box = FALSE, axes = FALSE)
+points(10.5, 10.5)
+```
+
+
+#References

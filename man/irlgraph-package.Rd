@@ -1,18 +1,18 @@
-\name{ilgraph-package}
-\alias{ilgraph-package}
-\alias{ilgraph}
+\name{irlgraph-package}
+\alias{irlgraph-package}
+\alias{irlgraph}
 \docType{package}
 \title{
-\packageTitle{ilgraph}
+\packageTitle{irlgraph}
 }
 \description{
-\packageDescription{ilgraph}
+\packageDescription{irlgraph}
 }
 
 \author{
-\packageAuthor{ilgraph}
+\packageAuthor{irlgraph}
 
-Maintainer: \packageMaintainer{ilgraph}
+Maintainer: \packageMaintainer{irlgraph}
 }
 \references{
 Etherington, T. R. (2012). Least-cost modelling on irregular landscape graphs. Landscape ecology, 27(7), 957-968.
