@@ -7,15 +7,15 @@
 impute_na(csurf, cells, nullcells, result, cellcoords)
 }
 \arguments{
-\item{csurf}{}
+\item{csurf}{RasterLayer}
 
-\item{cells}{}
+\item{cells}{numeric cell numbers}
 
-\item{nullcells}{}
+\item{nullcells}{numeric cell numbers}
 
-\item{result}{}
+\item{result}{RasterLayer}
 
-\item{cellcoords}{}
+\item{cellcoords}{matrix xy coordinates}
 }
 \description{
 Impute NA cells according to nearest neighbor

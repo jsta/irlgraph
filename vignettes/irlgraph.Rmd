@@ -91,7 +91,7 @@ plot(graph$tri, wlines = "triang", xlab = "", ylab = "", showrect = FALSE, pch =
 Partial accumlated cost surfaces can be generated from an irregular landscape graph by specifying a starting node to the `snode` or `scoord` arguments of the `acc_path` function. 
 
 ```{r eval=TRUE, fig.align='right', fig.height=4, fig.width=6}
-result<-acc_path(graph$graph, scoord = c(10.5, 10.5), costsurf = costsurf)
+result<-acc_path(graph = graph$graph, scoord = c(10.5, 10.5), costsurf = costsurf)
 
 par(mar=c(0,0,3,0))
 plot(result, box = FALSE, axes = FALSE)

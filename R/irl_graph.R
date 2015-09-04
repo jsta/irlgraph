@@ -17,8 +17,12 @@
 #'  1,  1,  1,  1,  1,  
 #'  1,  1,  1,  1,  1
 #'  ), ncol = 5, byrow = TRUE)
-#'  
-#'ir_graph(dm)
+#'
+#'plot(raster(dm))
+#'text(raster(dm), which(raster(dm)[] == 1))    
+#'
+#'graph <- irl_graph(dm)
+#'plot(graph$graph)
 
 irl_graph <- function(dm, poicoords = NA, grainprop = 0.25){
   csurf <- raster::raster(nrows=dim(dm)[1], ncols=dim(dm)[2], resolution=1, xmn=0, xmx = dim(dm)[1], ymn = 0, ymx = dim(dm)[2])
@@ -47,7 +51,10 @@ irl_graph <- function(dm, poicoords = NA, grainprop = 0.25){
     #set.seed(123)
     graincells <- sample(uncells, length(uncells) * grainprop)
     
+    poicells<-NULL
+    if(length(poicoords)>1){
     poicells <- apply(poicoords, 1, function(x) raster::cellFromXY(csurf, x))
+    }
     
     cells <- c(limitcells, vipcells, graincells, poicells)
     cells <- cells[!duplicated(cells)]
@@ -122,5 +129,6 @@ irl_graph <- function(dm, poicoords = NA, grainprop = 0.25){
   
   egraph2 <- igraph::graph.adjacency(adjmat, mode = "directed", weighted = TRUE)
   igraph::E(egraph2)$weight <- 1 / igraph::E(egraph2)$weight 
+  
   list(cells = cells, cellcoords = cellcoords, nullcells = nullcells, graph = egraph2, tri = dtri, limitcells = limitcells, vipcells = vipcells, graincells = graincells, poicells = poicells)
 }

@@ -3,11 +3,11 @@
 #'@export
 #'@importFrom spatstat as.ppp nncross
 #'@importFrom raster xyFromCell cellFromXY
-#'@param csurf
-#'@param cells
-#'@param nullcells
-#'@param result
-#'@param cellcoords
+#'@param csurf RasterLayer
+#'@param cells numeric cell numbers
+#'@param nullcells numeric cell numbers
+#'@param result RasterLayer
+#'@param cellcoords matrix xy coordinates
 
 impute_na <- function(csurf, cells, nullcells, result, cellcoords){
   nonnullcells <- (1:length(csurf))[!(1:length(csurf) %in% cells)]
