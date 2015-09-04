@@ -72,7 +72,7 @@ irgraph <- function(dm){
   #create graph====================================================#
   create_tri <- function(cellcoords){
     #cellcoords<-allcoords
-    deldir::deldir(cellcoords[,1], cellcoords[,2])
+    deldir::deldir(cellcoords[,1], cellcoords[,2], suppressMsge = TRUE)
   }
   
   dtri <- create_tri(allcoords)

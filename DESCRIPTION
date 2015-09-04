@@ -1,9 +1,11 @@
 Package: ilgraph
-Title: Create Irregular Landscape Graphs
+Title: Create Accumulated Cost Surfaces via Irregular Landscape Graphs
 Version: 1.0
 Date: 2015-08-28
 Author: Joseph Stachelek
 Maintainer: Joseph Stachelek <jstachel@sfwmd.gov>
-Description: Create irregular landscape graphs following Etherington 2012
+Description: Create accumulated cost surfaces via irregular landscape graphs following Etherington 2012
 License: GPL
 Imports: deldir, igraph, Matrix, sp, raster, spatstat
+Suggests: knitr, viridis
+VignetteBuilder: knitr

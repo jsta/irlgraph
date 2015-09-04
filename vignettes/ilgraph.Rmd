@@ -1,0 +1,99 @@
+---
+title: "Creating Irregular Landscape Graphs"
+author: "Joseph Stachelek"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+#Introduction
+
+This vignette describes how to generate irregular landscape graphs in order to produce accumulated cost surfaces. Accumulated cost surfaces generated in this manner have several benefits that are detailed by Etherington (2012). The code examples below are intended to reproduce the Etherington (2012) analysis. 
+
+##Installation
+
+```{r eval=FALSE}
+devtools::install_github("jsta/ilgraph")
+```
+
+#Methods
+
+##Generating Irregular Landscape Grahps
+
+The Etherington (2012) method of constructing irregular landscape graphs involves selecting a subset of points contained in the analysis domain. These sets include:
+
+1. Points of Interest
+2. Very important point cells
+3. Landscape limit cells
+4. Null data cells
+5. Ecological grain cells
+
+The fist set of operations in the `irgraph` function identifies these sets.
+
+```{r eval=TRUE, fig.align='center', fig.height=4, fig.width=6}
+library(ilgraph)
+
+dm<-as.matrix(read.delim(system.file("extdata/etherington20120code/cost-surface20x20.txt",
+package = "ilgraph"), skip = 6, na.strings = "-9999", header = FALSE, sep = " "))
+
+egraph2<-irgraph(dm=dm)
+
+costsurf <- raster::raster(nrows=dim(dm)[1],ncols=dim(dm)[2],resolution=1,xmn=0, xmx = dim(dm)[1], ymn = 0, ymx = dim(dm)[2])
+costsurf[] <- dm
+
+
+sp::plot(costsurf)
+grid.text("Cost", x=unit)
+legend("top", inset  = c(0, -0.2), legend = c("Points of interest", "Very important", "Landscape limit", "Null data", "Ecological grain"), col = viridis::viridis(5), pch = 1, horiz = TRUE, xpd = TRUE, cex = 0.7)
+
+points(raster::xyFromCell(costsurf,egraph2$nullcells), col = viridis::viridis(5)[4])
+points(raster::xyFromCell(costsurf,egraph2$cells), col = viridis::viridis(5)[1])
+
+#plot(dtri)
+
+```
+
+##Generating Accumulated Cost Surfaces
+
+Accumlated cost surfaces can be generated from an irregular landscape graph by specifying a starting node to the `snode` argument of the `get_path` function. 
+
+```{r eval=FALSE} 
+result<-get_path(egraph2$egraph2, snode = 171, csurf)
+```
+
+The 
+sp::plot(impute_na(csurf, egraph2$cells, egraph2$nullcells, result, egraph2$cellcoords))
+points(raster::xyFromCell(csurf,171))
+
+
+
+The figure sizes have been customised so that you can easily put two images side-by-side. 
+
+```{r, fig.show='hold'}
+plot(1:10)
+plot(10:1)
+```
+
+You can enable figure captions by `fig_caption: yes` in YAML:
+
+    output:
+      rmarkdown::html_vignette:
+        fig_caption: yes
+
+Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
+
+## More Examples
+
+You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
+
+```{r, echo=FALSE, results='asis'}
+knitr::kable(head(mtcars, 10))
+```
+
+Also a quote using `>`:
+
+> "He who gives up [code] safety for [code] speed deserves neither."
+([via](https://twitter.com/hadleywickham/status/504368538874703872))
