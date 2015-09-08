@@ -1,0 +1,48 @@
+#'@name gdist_acc
+#'@title Generate an accumulated cost surface using a regular landscape graph and the gdistance transition class
+#'@param costsurf
+#'@param scoord
+#'@param snode
+#'@importFrom gdistance transition transitionMatrix
+#'@importFrom igraph graph.adjacency shortest.paths E
+#'@importFrom Matrix cBind rBind
+#'@importFrom raster cellFromXY
+#'@export
+#'@examples
+#'dm <- as.matrix(read.delim(system.file("extdata/etherington20120code/cost-surface20x20.txt", package = "irlgraph"),
+#'skip = 6, na.strings = "-9999", header = FALSE, sep = " "))
+#'
+#'costsurf <- raster::raster(nrows=dim(dm)[1],ncols=dim(dm)[2],resolution=1,xmn=0, xmx = dim(dm)[1], ymn = 0, ymx = dim(dm)[2]) #neccessary to set resolution
+#'
+#'costsurf[] <- dm
+#'scoord <- c(10.5, 10.5)
+#'plot(gdist_acc(costsurf, scoord))
+
+gdist_acc <- function(costsurf, scoord = NULL, snode = NULL){
+  
+  ctrans <- gdistance::transition(costsurf, function(x) 1/mean(x), directions=8)
+  
+  if(is.null(snode) & all(is.null(scoord))){
+    stop("Must supply either a starting node or coordinates")
+  }
+  
+  if(is.null(snode)){
+    snode <- raster::cellFromXY(costsurf, scoord)
+  }
+  
+  mtrans <- gdistance::transitionMatrix(ctrans)
+  mtrans <- Matrix::rBind(mtrans,rep(0, nrow(mtrans)))
+  mtrans <- Matrix::cBind(mtrans,rep(0, nrow(mtrans)))
+  
+  startNode <- nrow(mtrans) #extra node to serve as origin
+  adjP <- cbind(rep(startNode, times=length(snode)), snode)
+  mtrans[adjP] <- Inf
+  adjacencyGraph <- igraph::graph.adjacency(mtrans, mode="directed", weighted=TRUE)
+  
+  igraph::E(adjacencyGraph)$weight <- 1/igraph::E(adjacencyGraph)$weight		
+  shortestPaths <- igraph::shortest.paths(adjacencyGraph, v=startNode)[-startNode]
+  
+  result <- as(costsurf, "RasterLayer")
+  result <- raster::setValues(result, shortestPaths)	
+  list(result = result, graph = adjacencyGraph)
+}

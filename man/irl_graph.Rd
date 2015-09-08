@@ -4,7 +4,8 @@
 \alias{irl_graph}
 \title{Generate an irregular landscape graph}
 \usage{
-irl_graph(dm, poicoords = NA, grainprop = 0.25)
+irl_graph(dm, poicoords = NA, grainprop = 0.25, cutoff = 0,
+  irregular = TRUE)
 }
 \arguments{
 \item{dm}{matrix cost raster}

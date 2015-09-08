@@ -4,7 +4,8 @@
 \alias{irl_acc}
 \title{Generate an accumulated cost surface from an irregular landscape graph}
 \usage{
-irl_acc(dm, poicoords, grainprop, costsurf, scoord, snode = NULL)
+irl_acc(dm, poicoords = NA, cutoff = 0, grainprop = 0.25, costsurf,
+  scoord, snode = NULL, irregular = TRUE)
 }
 \arguments{
 \item{dm}{matrix cost raster}

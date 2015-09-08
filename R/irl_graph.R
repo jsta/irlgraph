@@ -3,6 +3,7 @@
 #'@param dm matrix cost raster
 #'@param poicoords matrix
 #'@param grainprop numeric
+#'@param cutoff numeric
 #'@import sp
 #'@importFrom Matrix Matrix
 #'@importFrom igraph graph.adjacency E
@@ -24,11 +25,11 @@
 #'graph <- irl_graph(dm)
 #'plot(graph$graph)
 
-irl_graph <- function(dm, poicoords = NA, grainprop = 0.25, irregular = TRUE){
+irl_graph <- function(dm, poicoords = NA, grainprop = 0.25, cutoff = 0, irregular = TRUE){
   csurf <- raster::raster(nrows=dim(dm)[1], ncols=dim(dm)[2], resolution=1, xmn=0, xmx = dim(dm)[1], ymn = 0, ymx = dim(dm)[2])
   csurf[] <- dm
   
-  get_cells <- function(dm, grainprop, poicoords){
+  get_cells <- function(dm, grainprop, poicoords, cutoff = 0){
     
     csurf <- raster::raster(nrows=dim(dm)[1], ncols=dim(dm)[2], resolution=1, xmn=0, xmx = dim(dm)[1], ymn = 0, ymx = dim(dm)[2])
     csurf[] <- dm
@@ -43,7 +44,9 @@ irl_graph <- function(dm, poicoords = NA, grainprop = 0.25, irregular = TRUE){
     limitcells <- c(limitcells,which(raster::extract(raster::boundaries(csurf),allcells[,1:2]) == 1))
     limitcells <- limitcells[!duplicated(limitcells)]
     
-    vipcells <- which(raster::extract(raster::boundaries(csurf,classes = TRUE, type="outer"),allcells[,1:2]) == 1)
+    #allow for user-defined "importance cutoff"
+    focalsurf <- raster::focal(csurf, w = matrix(1/9, nrow = 3, ncol = 3), sd)
+    vipcells <- which(focalsurf[] > cutoff)
     vipcells <- vipcells[!(vipcells %in% limitcells)]
     vipcells <- vipcells[!(vipcells %in% nullcells)]
     
@@ -60,33 +63,34 @@ irl_graph <- function(dm, poicoords = NA, grainprop = 0.25, irregular = TRUE){
     cells <- cells[!duplicated(cells)]
     cells <- cells[order(cells)]
     
-    return(list(cells = cells, nullcells = nullcells, limitcells = limitcells, vipcells = vipcells, graincells = graincells, poicells = poicells))
+    return(list(cells = cells, nullcells = nullcells, limitcells = limitcells, vipcells = vipcells, graincells = graincells, poicells = poicells, allcells = which(allcells[,3]==0)))
   }
   
-  get_allcells <- function(dm){
-    
-    
-  }
-
-  if(irregular == TRUE){
-  cells <- get_cells(dm = dm, poicoords = poicoords, grainprop = grainprop)
+  cells <- get_cells(dm = dm, poicoords = poicoords, grainprop = grainprop, cutoff = cutoff)
+  
+  #'cells' contains all the cells in the following block
   poicells <- cells$poicells
   limitcells <- cells$limitcells
   vipcells <- cells$vipcells
   graincells <- cells$graincells
+  
   nullcells <- cells$nullcells
   nullcoords <- raster::xyFromCell(csurf, nullcells)[,1:2]
-  cells <- cells$cells
+  
+  if(irregular == TRUE){
+    cells <- cells$cells
+  }else{
+    cells <- cells$allcells
+  }
   cellcoords <- raster::xyFromCell(csurf, cells)[,1:2]
+  
+  
   
   allcells <- c(cells, nullcells)
   allcells <- allcells[order(allcells)]
   allcoords <- rbind(cellcoords, nullcoords)
   allcoords <- allcoords[order(-allcoords[,2], allcoords[,1]),]
-  }else{
-    cells <- get_allcells(dm = dm)
-    
-  }
+
   
   #create graph====================================================#
   create_tri <- function(cellcoords){

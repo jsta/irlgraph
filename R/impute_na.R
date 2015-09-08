@@ -27,6 +27,11 @@ impute_na <- function(result, csurf, graph){
   icells <- spatstat::as.ppp(nonnullcellcoords,c(0,dim(csurf)[1],0,dim(csurf)[2]))
   ncross <- spatstat::nncross(icells,fcells, what = "which")
   
-  result[nonnullcells] <- result[raster::cellFromXY(csurf, cellcoords[ncross,])]
-  result
+  if(length(ncross)<2){
+    warning("No cells found needing to impute.")
+    result
+  }else{
+    result[nonnullcells] <- result[raster::cellFromXY(csurf, cellcoords[ncross,])]
+    result
+  }
 }

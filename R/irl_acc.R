@@ -21,8 +21,10 @@
 #'result <- irl_acc(dm, poicoords, grainprop = 0.25, costsurf = costsurf, scoord = c(10.5, 10.5))
 #'}
 
-irl_acc <- function(dm, poicoords, grainprop, costsurf, scoord, snode = NULL){
-  graph <- irl_graph(dm, poicoords, grainprop = grainprop)
+irl_acc <- function(dm, poicoords = NA, cutoff = 0, grainprop = 0.25, costsurf, scoord, snode = NULL, irregular = TRUE){
+  
+  graph <- irl_graph(dm, poicoords = poicoords, grainprop = grainprop, irregular = irregular, cutoff = cutoff)
   result<-acc_path(graph = graph$graph, scoord = scoord, snode = snode, costsurf = costsurf)
+  
   impute_na(result, costsurf, graph)
 }
