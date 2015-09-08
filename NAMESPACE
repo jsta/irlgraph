@@ -2,6 +2,7 @@
 
 export(acc_path)
 export(impute_na)
+export(irl_acc)
 export(irl_graph)
 import(sp)
 importFrom(Matrix,Matrix)

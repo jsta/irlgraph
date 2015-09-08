@@ -4,16 +4,16 @@
 \alias{impute_na}
 \title{Impute NA cells according to nearest neighbor}
 \usage{
-impute_na(csurf, cells, nullcells, result, cellcoords)
+impute_na(result, csurf, graph)
 }
 \arguments{
+\item{result}{RasterLayer}
+
 \item{csurf}{RasterLayer}
 
 \item{cells}{numeric cell numbers}
 
 \item{nullcells}{numeric cell numbers}
-
-\item{result}{RasterLayer}
 
 \item{cellcoords}{matrix xy coordinates}
 }

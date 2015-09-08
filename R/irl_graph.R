@@ -24,7 +24,7 @@
 #'graph <- irl_graph(dm)
 #'plot(graph$graph)
 
-irl_graph <- function(dm, poicoords = NA, grainprop = 0.25){
+irl_graph <- function(dm, poicoords = NA, grainprop = 0.25, irregular = TRUE){
   csurf <- raster::raster(nrows=dim(dm)[1], ncols=dim(dm)[2], resolution=1, xmn=0, xmx = dim(dm)[1], ymn = 0, ymx = dim(dm)[2])
   csurf[] <- dm
   
@@ -60,9 +60,15 @@ irl_graph <- function(dm, poicoords = NA, grainprop = 0.25){
     cells <- cells[!duplicated(cells)]
     cells <- cells[order(cells)]
     
-    return(list(cells =cells, nullcells = nullcells, limitcells = limitcells, vipcells = vipcells, graincells = graincells, poicells = poicells))
+    return(list(cells = cells, nullcells = nullcells, limitcells = limitcells, vipcells = vipcells, graincells = graincells, poicells = poicells))
   }
   
+  get_allcells <- function(dm){
+    
+    
+  }
+
+  if(irregular == TRUE){
   cells <- get_cells(dm = dm, poicoords = poicoords, grainprop = grainprop)
   poicells <- cells$poicells
   limitcells <- cells$limitcells
@@ -77,6 +83,10 @@ irl_graph <- function(dm, poicoords = NA, grainprop = 0.25){
   allcells <- allcells[order(allcells)]
   allcoords <- rbind(cellcoords, nullcoords)
   allcoords <- allcoords[order(-allcoords[,2], allcoords[,1]),]
+  }else{
+    cells <- get_allcells(dm = dm)
+    
+  }
   
   #create graph====================================================#
   create_tri <- function(cellcoords){

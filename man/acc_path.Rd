@@ -2,20 +2,20 @@
 % Please edit documentation in R/acc_path.R
 \name{acc_path}
 \alias{acc_path}
-\title{Generate a shortest path raster from a specific graph node}
+\title{Generate a shortest path raster from a specific graph node or set of graph coordinates}
 \usage{
 acc_path(graph, costsurf, snode = NULL, scoord = NULL)
 }
 \arguments{
 \item{graph}{igraph object}
 
-\item{costsurf}{RasterLayer}
+\item{costsurf}{RasterLayer cost surface}
 
 \item{snode}{numeric node number}
 
 \item{scoord}{numeric coordinates of length 2}
 }
 \description{
-Generate a shortest path raster from a specific graph node
+Generate a shortest path raster from a specific graph node or set of graph coordinates
 }
 

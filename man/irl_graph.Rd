@@ -25,7 +25,7 @@ dm<-matrix(c( 1,  1,  1,  1,  1,
  ), ncol = 5, byrow = TRUE)
 
 plot(raster(dm))
-text(raster(dm), 1:ncell(raster(dm)))
+text(raster(dm), which(raster(dm)[] == 1))
 
 graph <- irl_graph(dm)
 plot(graph$graph)
