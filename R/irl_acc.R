@@ -18,13 +18,15 @@
 #'
 #'poicoords <- matrix(c(10.5, 10.5), ncol = 2)
 #'
-#'result <- irl_acc(dm, poicoords, grainprop = 0.25, costsurf = costsurf, scoord = c(10.5, 10.5))
+#'result <- irl_acc(dm, poicoords, grainprop = 0.25, costsurf = costsurf, scoord = matrix(c(10.5, 10.5), ncol = 2, byrow = TRUE))
 #'}
 
-irl_acc <- function(dm, poicoords = NA, cutoff = 0, grainprop = 0.25, costsurf, scoord, snode = NULL, irregular = TRUE){
+irl_acc <- function(dm, poicoords = NA, cutoff = 0, grainprop = 0.25, costsurf, scoord, snode = NULL, irregular = TRUE, warn = TRUE){
   
   graph <- irl_graph(dm, poicoords = poicoords, grainprop = grainprop, irregular = irregular, cutoff = cutoff)
+  
+  
   result<-acc_path(graph = graph$graph, scoord = scoord, snode = snode, costsurf = costsurf)
   
-  impute_na(result, costsurf, graph)
+  impute_na(result, costsurf, graph, warn = warn)
 }

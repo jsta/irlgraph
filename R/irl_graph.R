@@ -84,14 +84,11 @@ irl_graph <- function(dm, poicoords = NA, grainprop = 0.25, cutoff = 0, irregula
   }
   cellcoords <- raster::xyFromCell(csurf, cells)[,1:2]
   
-  
-  
   allcells <- c(cells, nullcells)
   allcells <- allcells[order(allcells)]
   allcoords <- rbind(cellcoords, nullcoords)
   allcoords <- allcoords[order(-allcoords[,2], allcoords[,1]),]
 
-  
   #create graph====================================================#
   create_tri <- function(cellcoords){
     #cellcoords<-allcoords

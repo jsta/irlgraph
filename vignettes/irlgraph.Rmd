@@ -18,8 +18,8 @@ This vignette describes the `irlgraph` package which provides functions to gener
 
 Currently the `irlgraph` package can only be installed by compiling from source. One easy way to compile `R` packages is to use the `devtools` package [@devtools]. Eventually, `irlgraph` may be submitted to CRAN where compiled binaries would be made available ( [http://cran.r-project.org](http://cran.r-project.org)).
 
-```{r echo=FALSE, eval=FALSE}
-devtools::install_github("jsta/irlgraph")
+```{r echo=TRUE, eval=FALSE}
+devtools::install_github("jsta/irlgraph", build_vignettes = TRUE)
 ```
 
 ##Generating Irregular Landscape Graphs
@@ -28,7 +28,7 @@ The @etherington2012 method of constructing irregular landscape graphs involves 
 
 * Points of Interest - optional points supplied to the `poicoords` argument of the `irl_graph` function.
 
-* Very important point cells - cells that lie on either side of a boundary between different cost-categories in the underlying cost raster. The definition of a boundary is set based on the user-set `cutoff` parameter.
+* Very important point cells - cells that lie on either side of a boundary between different cost-categories in the underlying cost raster. Boundaries are defined based on the difference between the user-set `cutoff` parameter and the standard deviation of a 3x3 moving window calculation.
 
 * Landscape limit cells - cells on the boundary of null data cells and cells bordering the cost raster extent.
 
@@ -37,6 +37,8 @@ The @etherington2012 method of constructing irregular landscape graphs involves 
 * Null data cells
 
 The following code block loads the cost raster from @etherington2012 and calls the `irl_graph` function to generate an irregular landscape graph. Next, a sequence of plotting commands are called in order to visualize the point subsets in relation to the cost raster.
+
+&nbsp;
 
 &nbsp;
 
@@ -53,8 +55,8 @@ skip = 6, na.strings = "-9999", header = FALSE, sep = " "))
 poicoords <- matrix(c(10.5, 10.5), ncol = 2)
 graph <- irl_graph(dm = dm, poicoords, grainprop = 0.25)
 
-costsurf <- raster::raster(nrows=dim(dm)[1],ncols=dim(dm)[2],resolution=1,xmn=0,
-xmx = dim(dm)[1], ymn = 0, ymx = dim(dm)[2]) #neccessary to set resolution
+costsurf <- raster::raster(nrows = dim(dm)[1], ncols=dim(dm)[2],
+resolution = 1, xmn = 0, xmx = dim(dm)[1], ymn = 0, ymx = dim(dm)[2]) #neccessary to set resolution
 costsurf[] <- dm
 
 par(mar = c(0,0,3,0))
@@ -123,44 +125,55 @@ package = "irlgraph"), skip = 6, na.strings = "-9999.0", header = FALSE, sep = "
 dm <- lapply(dm, function(x) read_dm(x))
 
 make_costsurf <- function(x){
-  #x<-dm[[1]]
   costsurf <- raster::raster(nrows=dim(x)[1],ncols=dim(x)[2],resolution=1,xmn=0,
-xmx = dim(x)[1], ymn = 0, ymx = dim(x)[2]) #neccessary to set resolution
+xmx = dim(x)[1], ymn = 0, ymx = dim(x)[2])
   costsurf[] <- x
   costsurf
 }
 
 costsurfs <- lapply(dm, function(x) make_costsurf(x))
 
-times <- lapply(1:length(dm), function(x) system.time(irl_acc(dm[[x]], poicoords = matrix(c(10.5, 10.5), ncol = 2), grainprop = 0.25, costsurf = costsurfs[[x]], scoord = c(10.5, 10.5), cutoff = 0.2)))
+times <- lapply(1:length(dm), function(x) system.time(irl_acc(dm[[x]],                          
+poicoords = matrix(c(10.5, 10.5), ncol = 2), grainprop = 0.25, costsurf = costsurfs[[x]],
+scoord = c(10.5, 10.5), cutoff = 0.2)))
 
-fulltimes <- lapply(1:length(dm), function (x) system.time(irl_acc(dm[[x]], poicoords = matrix(c(10.5, 10.5), ncol = 2), costsurf = costsurfs[[x]], scoord = c(10.5, 10.5), irregular = FALSE)))
+fulltimes <- lapply(1:length(dm), function (x) system.time(irl_acc(dm[[x]],
+poicoords = matrix(c(10.5, 10.5), ncol = 2), costsurf = costsurfs[[x]],
+scoord = c(10.5, 10.5), irregular = FALSE, warn = FALSE)))
 
-regtimes <- lapply(costsurfs, function(x) system.time(gdist_acc(x, scoord = c(10.5, 10.5))))
+regtimes <- lapply(costsurfs,
+function(x) system.time(gdist_acc(x, scoord = c(10.5, 10.5))))
 
 times <- matrix(unlist(times), ncol = 5, byrow = TRUE)[,3]
 fulltimes <- matrix(unlist(fulltimes), ncol = 5, byrow = TRUE)[,3]
 regtimes <- matrix(unlist(regtimes), ncol = 5, byrow = TRUE)[,3]
 
 count_vertedge <- function(graph){
-  igraph::vcount(graph$graph) * igraph::ecount(graph$graph) #ethcode is not a true triangulation but instead fully diagonal...
+  igraph::vcount(graph$graph) * igraph::ecount(graph$graph) 
+  #a triangulation is not fully diagonal...
 }
 
-vertxedges <- lapply(dm, function(x) count_vertedge(irl_graph(x, grainprop = 0.25, cutoff = 0.2)))
+vertxedges <- lapply(dm, function(x) count_vertedge(irl_graph(x,
+  grainprop = 0.25, cutoff = 0.2)))
 fullvertxedges <- lapply(dm, function(x) count_vertedge(irl_graph(x, irregular = FALSE)))
-regvertxedges <- lapply(costsurfs, function(x) count_vertedge(gdist_acc(x, scoord = c(10.5, 10.5))))
-#x<-costsurfs[[1]]
+regvertxedges <- lapply(costsurfs, function(x) count_vertedge(gdist_acc(x,
+  scoord = c(10.5, 10.5))))
 
 par(mar=c(4,4,2,2))
-plot(cbind(fullvertxedges, fulltimes), ylim = c(0.1, 60), xlim = c(0, 8e+08), log = "y", ylab = "Processing Times (s)", xlab = "Landscape graph vertices x edges")
+plot(cbind(unlist(fullvertxedges), fulltimes), ylim = c(0.05, 60), xlim = c(0, 8e+08), 
+  log = "y", ylab = "Processing Times (s)", xlab = "Landscape graph vertices x edges")
 points(cbind(vertxedges, times), col = "red")
 points(cbind(regvertxedges, regtimes), col = "grey")
 
-df <- data.frame(vertxedges = unlist(vertxedges), times, fullvertxedges = unlist(fullvertxedges), fulltimes, regvertxedges = unlist(regvertxedges), regtimes)
+df <- data.frame(vertxedges = unlist(vertxedges), times,
+fullvertxedges = unlist(fullvertxedges), fulltimes,
+regvertxedges = unlist(regvertxedges), regtimes)
 
 fit <- nls(times ~ b * vertxedges^power, data = df, start = list(b = 0.001, power = 1))
-fullfit <- nls(fulltimes ~ b * fullvertxedges^power, data = df, start = list(b = 0.001, power = 1))
-regfit <- nls(regtimes ~ b * regvertxedges^power, data = df, start = list(b = 0.001, power = 0.2))
+fullfit <- nls(fulltimes ~ b * fullvertxedges^power,
+  data = df, start = list(b = 0.001, power = 1))
+regfit <- nls(regtimes ~ b * regvertxedges^power,
+  data = df, start = list(b = 0.001, power = 0.2))
 
 s <- seq(0, max(df$vertxedges), 1e+07)
 fs <- seq(0, max(df$fullvertxedges), 1e+07)
@@ -170,7 +183,8 @@ lines(s, predict(fit, list(vertxedges = s)), col = "red")
 lines(fs, predict(fullfit, list(fullvertxedges = fs)), col = "black")
 lines(rs, predict(regfit, list(regvertxedges = rs)), col = "grey")
 
-legend("topright", legend = c("full","irregular", "regular"), col = c("black", "red", "grey"), pch = 1)
+legend("topright", legend = c("full","irregular", "regular"),
+col = c("black", "red", "grey"), pch = 1)
 
 ```
 

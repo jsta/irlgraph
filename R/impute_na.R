@@ -8,8 +8,9 @@
 #'@param nullcells numeric cell numbers
 #'@param result RasterLayer
 #'@param cellcoords matrix xy coordinates
+#'@param warn logical print warnings?
 
-impute_na <- function(result, csurf, graph){
+impute_na <- function(result, csurf, graph, warn = TRUE){
   
   cells<-graph$cells
   infcells <- cells[which(result[cells]==Inf)]
@@ -28,7 +29,9 @@ impute_na <- function(result, csurf, graph){
   ncross <- spatstat::nncross(icells,fcells, what = "which")
   
   if(length(ncross)<2){
+    if(warn==TRUE){
     warning("No cells found needing to impute.")
+    }
     result
   }else{
     result[nonnullcells] <- result[raster::cellFromXY(csurf, cellcoords[ncross,])]

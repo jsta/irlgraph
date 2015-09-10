@@ -4,12 +4,14 @@
 \alias{impute_na}
 \title{Impute NA cells according to nearest neighbor}
 \usage{
-impute_na(result, csurf, graph)
+impute_na(result, csurf, graph, warn = TRUE)
 }
 \arguments{
 \item{result}{RasterLayer}
 
 \item{csurf}{RasterLayer}
+
+\item{warn}{logical print warnings?}
 
 \item{cells}{numeric cell numbers}
 
