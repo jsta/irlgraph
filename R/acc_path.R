@@ -9,8 +9,6 @@
 
 acc_path <- function(graph, costsurf, snode = NULL, scoord = NULL){
   
-  #ADD A CHECK TO MAKE SURE SNODE EXISTS IN GRID!!!
-  
   if(is.null(snode) & all(is.null(scoord))){
     stop("Must supply either a starting node or coordinates")
   }
@@ -19,7 +17,10 @@ acc_path <- function(graph, costsurf, snode = NULL, scoord = NULL){
     snode <- raster::cellFromXY(costsurf, scoord)
   }
   
-  spaths <- igraph::shortest.paths(graph, v = snode)
+  #ADD A CHECK TO MAKE SURE SNODE EXISTS IN GRID!!!
+  #snode %in% graph$cells 
+  
+  spaths <- igraph::shortest.paths(graph$graph, v = snode)
   
   result <- as(costsurf, "RasterLayer")
   result[] <- NA

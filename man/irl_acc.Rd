@@ -31,7 +31,8 @@ costsurf[] <- dm
 
 poicoords <- matrix(c(10.5, 10.5), ncol = 2)
 
-result <- irl_acc(dm, poicoords, grainprop = 0.25, costsurf = costsurf, scoord = c(10.5, 10.5))
+result <- irl_acc(dm, poicoords = poicoords, grainprop = 0.25, costsurf = costsurf, scoord = matrix(c(19.5, 0.5, 11.5, 11.5), ncol = 2, byrow = TRUE))
+result <- irl_acc(dm, poicoords = poicoords, grainprop = 0.25, costsurf = costsurf, scoord = matrix(c(11.5, 11.5), ncol = 2, byrow = TRUE))
 }
 }
 

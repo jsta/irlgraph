@@ -27,10 +27,11 @@ dm<-matrix(c( 1,  1,  1,  1,  1,
  1,  1,  1,  1,  1
  ), ncol = 5, byrow = TRUE)
 
-plot(raster(dm))
-text(raster(dm), which(raster(dm)[] == 1))
+sp::plot(raster::raster(dm))
+raster::text(raster::raster(dm), which(raster::raster(dm)[] == 1))
 
 graph <- irl_graph(dm)
 plot(graph$graph)
+geometry::trimesh(graph$tri, graph$allcoords)
 }
 

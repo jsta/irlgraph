@@ -15,11 +15,18 @@
 #'costsurf <- raster::raster(nrows=dim(dm)[1],ncols=dim(dm)[2],resolution=1,xmn=0, xmx = dim(dm)[1], ymn = 0, ymx = dim(dm)[2]) #neccessary to set resolution
 #'
 #'costsurf[] <- dm
-#'scoord <- c(10.5, 10.5)
-#'plot(gdist_acc(costsurf, scoord))
+#'scoord <- matrix(c(10.5, 10.5, 15.5, 15.5), ncol = 2, byrow = TRUE)
+#'result <-  gdist_acc(costsurf, scoord)
+#'
+#'plot(result[[1]]$result)
+#'points(scoord[1,1], scoord[1,2])
+#'
+#'plot(result[[2]]$result)
+#'points(scoord[2,1], scoord[2,2])
 
 gdist_acc <- function(costsurf, scoord = NULL, snode = NULL){
   
+  gdist_acc_surf <- function(costsurf, scoord, snode){
   ctrans <- gdistance::transition(costsurf, function(x) 1/mean(x), directions=8)
   
   if(is.null(snode) & all(is.null(scoord))){
@@ -45,4 +52,7 @@ gdist_acc <- function(costsurf, scoord = NULL, snode = NULL){
   result <- as(costsurf, "RasterLayer")
   result <- raster::setValues(result, shortestPaths)	
   list(result = result, graph = adjacencyGraph)
+  }
+  
+  lapply(1:nrow(scoord), function(x) gdist_acc_surf(costsurf = costsurf, scoord = scoord[x,], snode = snode))
 }

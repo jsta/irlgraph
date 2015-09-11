@@ -19,11 +19,12 @@
 #'  1,  1,  1,  1,  1
 #'  ), ncol = 5, byrow = TRUE)
 #'
-#'plot(raster(dm))
-#'text(raster(dm), which(raster(dm)[] == 1))    
+#'sp::plot(raster::raster(dm))
+#'raster::text(raster::raster(dm), which(raster::raster(dm)[] == 1))    
 #'
 #'graph <- irl_graph(dm)
 #'plot(graph$graph)
+#'geometry::trimesh(graph$tri, graph$allcoords)
 
 irl_graph <- function(dm, poicoords = NA, grainprop = 0.25, cutoff = 0, irregular = TRUE){
   csurf <- raster::raster(nrows=dim(dm)[1], ncols=dim(dm)[2], resolution=1, xmn=0, xmx = dim(dm)[1], ymn = 0, ymx = dim(dm)[2])
@@ -91,36 +92,46 @@ irl_graph <- function(dm, poicoords = NA, grainprop = 0.25, cutoff = 0, irregula
 
   #create graph====================================================#
   create_tri <- function(cellcoords){
-    #cellcoords<-allcoords
-    deldir::deldir(cellcoords[,1], cellcoords[,2], suppressMsge = TRUE)
+    #deldir::deldir(cellcoords[,1], cellcoords[,2], suppressMsge = TRUE)
+    
+    tri <- geometry::delaunayn(cellcoords)
+    #tri <- geometry::delaunayn(allcoords)
+    #trimesh(tri, allcoords)
+    
+    nodes <- rbind(tri[,-1], tri[,-2], tri[,-3])
+    nodes <- nodes[order(nodes[,1]),]
+    list(nodes = nodes[!duplicated(paste(nodes[,1], nodes[,2])),], tri = tri)
   }
   
   dtri <- create_tri(allcoords)
+  #trimesh(dtri$tri, allcoords)
   
   #create adjacency matrix===========================================#
   create_adjmat <- function(dtri, cells){
     
-    orig <- allcells[dtri$delsgs[,5]]
-    neigh <- allcells[dtri$delsgs[,6]]
-    keep <- !(orig %in% nullcells) & !(neigh %in% nullcells)
+    orig <- allcells[dtri$nodes[,1]]
+    neigh <- allcells[dtri$nodes[,2]]
     
+    keep <- !(orig %in% nullcells) & !(neigh %in% nullcells)
     orig <- orig[keep]
     neigh <- neigh[keep]
     elist <- cbind(orig, neigh)
     
     edgelengths<-rep(1, nrow(elist))
     celldiff <- elist[,1] - elist [,2]
-    longedges<-which(!celldiff %in% c(1, dim(csurf)[1]))#dim(csurf)[1] - 1, dim(csurf)[1]  + 1
+    longedges<-which(!celldiff %in% c(1, dim(csurf)[1]))
     longedgecoords_from<-raster::xyFromCell(csurf, elist[longedges,1])
     longedgecoords_to<-raster::xyFromCell(csurf, elist[longedges,2])
     
     elength_from_coords <- function(from, to){
-      a <- from[1] - to[1]
-      b <- from[2] - to[2]
+      a <- from[,1] - to[,1]
+      b <- from[,2] - to[,2]
       sqrt(a^2 + b^2)
     }
     
-    edgelengths[longedges] <- apply(cbind(longedgecoords_from, longedgecoords_to), 1, function(x) elength_from_coords(x[1:2], x[3:4]))
+    edgelengths[longedges] <- elength_from_coords(longedgecoords_from, longedgecoords_to)
+    
+    #edgelengths[longedges] <- apply(cbind(longedgecoords_from, longedgecoords_to), 1, function(x) elength_from_coords(x[1:2], x[3:4]))
     
     #if(length(unique(elist[,1]))!=length(cells)){
     #  warning("Mismatch between edgelist and nonnull cells")
@@ -141,5 +152,5 @@ irl_graph <- function(dm, poicoords = NA, grainprop = 0.25, cutoff = 0, irregula
   egraph2 <- igraph::graph.adjacency(adjmat, mode = "directed", weighted = TRUE)
   igraph::E(egraph2)$weight <- 1 / igraph::E(egraph2)$weight 
   
-  list(cells = cells, cellcoords = cellcoords, nullcells = nullcells, graph = egraph2, tri = dtri, limitcells = limitcells, vipcells = vipcells, graincells = graincells, poicells = poicells)
+  list(cells = cells, cellcoords = cellcoords, nullcells = nullcells, graph = egraph2, tri = dtri, limitcells = limitcells, vipcells = vipcells, graincells = graincells, poicells = poicells, allcoords = allcoords)
 }
