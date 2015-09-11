@@ -25,20 +25,12 @@
 irl_acc <- function(dm, poicoords = NA, cutoff = 0, grainprop = 0.25, costsurf, scoord, snode = NULL, irregular = TRUE, warn = TRUE){
   
   graph <- irl_graph(dm, poicoords = poicoords, grainprop = grainprop, irregular = irregular, cutoff = cutoff)
-  #browser()
+  
   acc_surf <- function(graph, scoord, snode, costsurf, warn){
-    #print(scoord)
     path <- acc_path(graph = graph, scoord = scoord, snode = snode, costsurf = costsurf)
     impute_na(path, costsurf, graph, warn = warn)
   } 
   
-  #acc_surf(graph$graph, scoord = scoord, snode = snode, costsurf, warn)
-  
   lapply(1:nrow(scoord), function(x) acc_surf(graph, scoord =  scoord[x,], snode = NULL, costsurf = costsurf, warn = warn))
   
-  #lapply(1:nrow(scoord), function(x) print(scoord[x,])) 
-  
-  #test <- lapply(1:nrow(scoord), function(x) acc_surf(graph, scoord =  scoord[x,], snode = snode, costsurf = costsurf, warn = warn)) 
-  #test <- acc_surf(graph, scoord =  scoord[2,], snode = snode, costsurf = costsurf, warn = warn)
-    
 }
