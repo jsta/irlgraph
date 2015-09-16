@@ -15,6 +15,8 @@ irl_graph(dm, poicoords = NA, grainprop = 0.25, cutoff = 0,
 \item{grainprop}{numeric}
 
 \item{cutoff}{numeric}
+
+\item{irregular}{logical}
 }
 \description{
 Generate an irregular landscape graph
@@ -32,6 +34,6 @@ raster::text(raster::raster(dm), which(raster::raster(dm)[] == 1))
 
 graph <- irl_graph(dm)
 plot(graph$graph)
-geometry::trimesh(graph$tri, graph$allcoords)
+geometry::trimesh(graph$tri$tri, graph$allcoords)
 }
 

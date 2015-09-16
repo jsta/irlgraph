@@ -4,11 +4,12 @@
 #'@param poicoords matrix
 #'@param grainprop numeric
 #'@param cutoff numeric
+#'@param irregular logical
 #'@import sp
 #'@importFrom Matrix Matrix
 #'@importFrom igraph graph.adjacency E
 #'@importFrom raster raster extract boundaries cellFromCol cellFromRow cellFromXY xyFromCell
-#'@importFrom deldir deldir
+#'@importFrom geometry delaunayn
 #'@export
 #'@examples
 #'
@@ -24,7 +25,7 @@
 #'
 #'graph <- irl_graph(dm)
 #'plot(graph$graph)
-#'geometry::trimesh(graph$tri, graph$allcoords)
+#'geometry::trimesh(graph$tri$tri, graph$allcoords)
 
 irl_graph <- function(dm, poicoords = NA, grainprop = 0.25, cutoff = 0, irregular = TRUE){
   csurf <- raster::raster(nrows=dim(dm)[1], ncols=dim(dm)[2], resolution=1, xmn=0, xmx = dim(dm)[1], ymn = 0, ymx = dim(dm)[2])

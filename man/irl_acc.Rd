@@ -12,7 +12,19 @@ irl_acc(dm, poicoords = NA, cutoff = 0, grainprop = 0.25, costsurf,
 
 \item{poicoords}{matrix}
 
+\item{cutoff}{numeric between 0 and 1}
+
 \item{grainprop}{numeric}
+
+\item{costsurf}{Raster}
+
+\item{scoord}{matrix 2 column}
+
+\item{snode}{numeric}
+
+\item{irregular}{logical}
+
+\item{warn}{logical}
 }
 \description{
 This high level function allows for generation of an accumulated cost surface from a single function call.
@@ -22,8 +34,8 @@ This high level function allows for generation of an accumulated cost surface fr
 set.seed(123) #make reproducible
 
 dm <- as.matrix(read.delim(system.file(
-"extdata/etherington20120code/cost-surface20x20.txt", package = "irlgraph"),
-skip = 6, na.strings = "-9999", header = FALSE, sep = " "))
+"extdata/etherington20120code/cost-surface20x20.txt",
+package = "irlgraph"), skip = 6, na.strings = "-9999", header = FALSE, sep = " "))
 
 costsurf <- raster::raster(nrows=dim(dm)[1],ncols=dim(dm)[2],resolution=1,xmn=0,
 xmx = dim(dm)[1], ymn = 0, ymx = dim(dm)[2]) #neccessary to set resolution
@@ -31,8 +43,10 @@ costsurf[] <- dm
 
 poicoords <- matrix(c(10.5, 10.5), ncol = 2)
 
-result <- irl_acc(dm, poicoords = poicoords, grainprop = 0.25, costsurf = costsurf, scoord = matrix(c(19.5, 0.5, 11.5, 11.5), ncol = 2, byrow = TRUE))
-result <- irl_acc(dm, poicoords = poicoords, grainprop = 0.25, costsurf = costsurf, scoord = matrix(c(11.5, 11.5), ncol = 2, byrow = TRUE))
+result <- irl_acc(dm, poicoords = poicoords, grainprop = 0.25,
+costsurf = costsurf, scoord = matrix(c(19.5, 0.5, 11.5, 11.5), ncol = 2, byrow = TRUE))
+result <- irl_acc(dm, poicoords = poicoords, grainprop = 0.25,
+costsurf = costsurf, scoord = matrix(c(11.5, 11.5), ncol = 2, byrow = TRUE))
 }
 }
 

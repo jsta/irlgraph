@@ -4,15 +4,13 @@
 #'@importFrom spatstat as.ppp nncross
 #'@importFrom raster xyFromCell cellFromXY
 #'@param csurf RasterLayer
-#'@param cells numeric cell numbers
-#'@param nullcells numeric cell numbers
 #'@param result RasterLayer
-#'@param cellcoords matrix xy coordinates
 #'@param warn logical print warnings?
+#'@param graph igraph object
 
 impute_na <- function(result, csurf, graph, warn = TRUE){
   
-  cells<-graph$cells
+  cells <- graph$cells
   infcells <- cells[which(result[cells]==Inf)]
   
   nonnullcells <- (1:length(csurf))[!(1:length(csurf) %in% graph$cells)]

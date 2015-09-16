@@ -11,13 +11,9 @@ impute_na(result, csurf, graph, warn = TRUE)
 
 \item{csurf}{RasterLayer}
 
+\item{graph}{igraph object}
+
 \item{warn}{logical print warnings?}
-
-\item{cells}{numeric cell numbers}
-
-\item{nullcells}{numeric cell numbers}
-
-\item{cellcoords}{matrix xy coordinates}
 }
 \description{
 Impute NA cells according to nearest neighbor
