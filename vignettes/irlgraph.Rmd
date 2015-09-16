@@ -83,11 +83,10 @@ points(xyFromCell(costsurf, graph$graincells), col = viridis::viridis(5)[5])
 
 The underlying graph can be visualized with the following call to the `plot` command. This preliminary graph includes edge connections to null cell nodes. Note that these nodes and any edge connections to these cells are stripped in the code underlying the `irl_graph` function before the final graph is constructed.
 
-```{r eval=TRUE, fig.align='center', fig.height=3.9, fig.width=5}
+```{r eval=TRUE, fig.align='left', fig.height=3.2, fig.width=3.2}
 par(mar=c(2,0,0,0))
 geometry::trimesh(graph$tri$tri, graph$allcoords)
 points(graph$allcoords)
-#plot(graph$tri, wlines = "triang", xlab = "", ylab = "", showrect = FALSE, pch = 7)
 ```
 
 ##Generating Accumulated Cost Surfaces
@@ -114,10 +113,12 @@ points(10.5, 10.5)
 
 ##Processing Speeds
 
-```{r eval=TRUE, fig.align='right', fig.height=4, fig.width=6}
+One advantage of using irregular landscape (IRL) graphs to generate accumulated cost surfaces is the reduction in processing times relative to regular landscape (RL) graphs. IRL graphs have less edge connections between nodes because they are formed from a delaunay triangulation rather than being fully diagonal. Apart from differences in edge density, it is difficult to compare the speed of the two approaches. Differences in programming language, implementation (compiled vs interpreted code), and style (looping vs vectorized code) can dramatically affect processing times and mask reliable estimation of processing speed. In the code chunk that follows, it appears that RL graphs are faster than IRL graphs for a single starting node. However, IRL graphs are faster when there are many (dozens) of starting nodes. IRL graphs afford greater increases in processing speed when greater numbers of starting nodes are calculated. 
+
+```{r eval=TRUE, fig.align='left', fig.height=3.2, fig.width=4.6}
 
 dm <- c("40", "60", "80", "100")
-coordmat <- matrix(c(rbind(seq(0.5, 38.5, 0.5), 0.5), rbind(0.5, seq(0.5, 12.5, 0.5))), byrow = TRUE, ncol = 2)
+coordmat <- matrix(c(rbind(seq(0.5, 38.5, 0.5), 0.5), rbind(0.5, seq(0.5, 16.5, 0.5))), byrow = TRUE, ncol = 2)
 
 read_dm <- function(x){
   as.matrix(read.delim(system.file(file.path(
@@ -164,7 +165,7 @@ regvertxedges <- lapply(costsurfs, function(x) count_vertedge(gdist_acc(x,
 
 par(mar=c(4,4,2,2))
 plot(cbind(unlist(fullvertxedges), fulltimes), ylim = c(0.2, 60), xlim = c(0, 8e+08), 
-  log = "y", ylab = "Processing Times (s)", xlab = "Landscape graph vertices x edges")
+  log = "y", ylab = "Processing Times (s)", xlab = "Landscape graph vertices x edges", main = paste0(nrow(coordmat), " starting nodes"))
 points(cbind(vertxedges, times), col = "red")
 points(cbind(regvertxedges, regtimes), col = "grey")
 
@@ -186,7 +187,7 @@ lines(s, predict(fit, list(vertxedges = s)), col = "red")
 lines(fs, predict(fullfit, list(fullvertxedges = fs)), col = "black")
 lines(rs, predict(regfit, list(regvertxedges = rs)), col = "grey")
 
-legend("topright", legend = c("full","irregular", "regular"),
+legend("bottomright", legend = c("full","irregular", "regular"),
 col = c("black", "red", "grey"), pch = 1)
 
 ```
