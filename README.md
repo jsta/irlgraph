@@ -1,7 +1,7 @@
 irlgraph
 ======
 
-The `R` package [irlgraph] provides the functionality to generate accumulated cost surfaces using irregular landscape graphs.
+The `R` package `irlgraph` provides the functionality to generate accumulated cost surfaces using irregular landscape graphs.
 
 ##Installation
   ```R
