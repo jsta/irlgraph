@@ -8,6 +8,15 @@ The `R` package `irlgraph` provides the functionality to generate accumulated co
   install.packages('devtools')  # package devtools needed
   devtools::install_github('jsta/irlgraph')
   ```
+##Summary
+
+![](inst/doc/figure-1.png)
+![](inst/doc/figure-2.png)
+![](inst/doc/figure-3.png)
+![](inst/doc/figure-4.png)
+![](inst/doc/figure-5.png)
+![](inst/doc/figure-6.png)
+![](inst/doc/figure-7.png)
 
 ##Examples
 **see vignette**
