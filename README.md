@@ -8,15 +8,20 @@ The `R` package `irlgraph` provides the functionality to generate accumulated co
   install.packages('devtools')  # package devtools needed
   devtools::install_github('jsta/irlgraph')
   ```
+  
 ##Summary
 
-![](inst/doc/figure-1.png)
-![](inst/doc/figure-2.png)
-![](inst/doc/figure-3.png)
-![](inst/doc/figure-4.png)
-![](inst/doc/figure-5.png)
-![](inst/doc/figure-6.png)
+![](inst/doc/irl-construction.png)
+
+**Figure 1: Construction of accumulated cost surfaces using irregular landscape graphs. Panels from left to right represent the process of: identifying graph nodes, Delaunay triangulation, generating partial accumulated cost surfaces, and interpolating to produce full accumulated cost surfaces.**
+
+![](inst/doc/processing-speed.png)
+
+**Figure 2: Comparison of `system.time` processing speed when using regular and irregular graphs to produce accumulated cost surfaces. The performance benefit of irregular graphs becomes apparent with greater numbers of starting nodes.**
+
 ![](inst/doc/figure-7.png)
+
+**Figure 3: Directional bias tests of irregular and regular graph approaches to generating accumulate cost surfaces. The `gdistance::geoCorrection` function eliminates directional bias associated with regular graphs.**
 
 ##Examples
 **see vignette**
