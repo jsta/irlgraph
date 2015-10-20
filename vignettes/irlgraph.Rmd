@@ -54,7 +54,8 @@ dm <- as.matrix(read.delim(system.file(
   header = FALSE, sep = " "))
 
 poicoords <- matrix(c(10.5, 10.5), ncol = 2)
-graph <- suppressMessages(irl_graph(dm = dm, poicoords, grainprop = 0.25))
+graph <- suppressMessages(irl_graph(dm = dm,
+  poicoords, grainprop = 0.25))
 
 costsurf <- raster::raster(nrows = dim(dm)[1], ncols=dim(dm)[2], 
   resolution = 1, xmn = 0, xmx = dim(dm)[1], ymn = 0,
@@ -63,7 +64,9 @@ costsurf <- raster::raster(nrows = dim(dm)[1], ncols=dim(dm)[2],
 costsurf[] <- dm
 
 par(mar = c(0,0,3,0))
-plot(costsurf, box = FALSE, axes = FALSE, legend.args = list(text="Cost"), col = rev(viridis::magma(255)))
+plot(costsurf, box = FALSE, axes = FALSE,
+  legend.args = list(text="Cost"),
+  col = rev(viridis::magma(255)))
 
 legend("top", inset  = c(0, -0.2),
   legend = c("Points of interest", "Very important",
@@ -109,7 +112,9 @@ result<-acc_path(graph = graph, scoord = c(10.5, 10.5),
   costsurf = costsurf)
 
 par(mar=c(0,0,3,0))
-plot(result, box = FALSE, axes = FALSE, legend.args = list(text = "Acc. Cost"), col = rev(viridis::viridis(255)))
+plot(result, box = FALSE, axes = FALSE,
+  legend.args = list(text = "Acc. Cost"),
+  col = rev(viridis::viridis(255)))
 points(10.5, 10.5)
 ```
 
@@ -119,7 +124,9 @@ These partial surfaces can be converted to complete accumulated cost surfaces by
 result <- impute_na(result, costsurf, graph)
 
 par(mar=c(0,0,3,0))
-plot(result, box = FALSE, axes = FALSE, legend.args = list(text = "Acc. Cost"), col = rev(viridis::viridis(255)))
+plot(result, box = FALSE, axes = FALSE,
+  legend.args = list(text = "Acc. Cost"),
+  col = rev(viridis::viridis(255)))
 points(10.5, 10.5)
 ```
 
@@ -134,8 +141,12 @@ One advantage of using irregular landscape (IRL) graphs to generate accumulated 
 #  rbind(0.5, seq(0.5, 16.5, 0.5))), byrow = TRUE, ncol = 2)
 
 #10 nodes
-  coordmat <- matrix(c(rbind(seq(0.5, 2.5, 0.5), 0.5),
-    rbind(0.5, seq(0.5, 2.5, 0.5))), byrow = TRUE, ncol = 2)
+coordmat <- matrix(c(rbind(seq(0.5, 2.5, 0.5), 0.5),
+  rbind(0.5, seq(0.5, 2.5, 0.5))), byrow = TRUE, ncol = 2)
+
+#2 nodes
+#coordmat <- matrix(c(rbind(seq(0.5, 2.5, 0.5), 0.5),
+#  rbind(0.5, seq(0.5, 2.5, 0.5))), byrow = TRUE, ncol = 2)[1:2,]
 
   dm <- c("40", "60", "80", "100")
   
@@ -157,20 +168,23 @@ One advantage of using irregular landscape (IRL) graphs to generate accumulated 
   
   costsurfs <- lapply(dm, function(x) make_costsurf(x))
   
-  times <- lapply(1:length(dm), function(x) system.time(irl_acc(dm[[x]], 
-    poicoords = matrix(c(10.5, 10.5), ncol = 2), grainprop = 0.25,
-    costsurf = costsurfs[[x]], scoord = coordmat, cutoff = 0.2)))
+  times <- lapply(1:length(dm),
+    function(x) system.time(irl_acc(dm[[x]],
+    poicoords = matrix(c(10.5, 10.5), ncol = 2),
+    grainprop = 0.25, costsurf = costsurfs[[x]],
+    scoord = coordmat, cutoff = 0.2)))
   
   fulltimes <- lapply(1:length(dm), function (x) 
     system.time(irl_acc(dm[[x]], poicoords = matrix(c(10.5, 10.5),
     ncol = 2), costsurf = costsurfs[[x]], scoord = coordmat, 
     irregular = FALSE, warn = FALSE)))
   
-  regtimes <- lapply(costsurfs, function(x) system.time(gdist_acc(x,
-    scoord = coordmat)))
+  regtimes <- lapply(costsurfs,
+    function(x) system.time(gdist_acc(x, scoord = coordmat)))
   
   times <- matrix(unlist(times), ncol = 5, byrow = TRUE)[,3]
-  fulltimes <- matrix(unlist(fulltimes), ncol = 5, byrow = TRUE)[,3]
+  fulltimes <- matrix(unlist(fulltimes), ncol = 5,
+    byrow = TRUE)[,3]
   regtimes <- matrix(unlist(regtimes), ncol = 5, byrow = TRUE)[,3]
   
   count_vertedge <- function(graph){
@@ -190,8 +204,9 @@ One advantage of using irregular landscape (IRL) graphs to generate accumulated 
     byrow = TRUE))[[1]]))
   
   par(mar=c(4,4,2,2))
-  plot(cbind(unlist(fullvertxedges), fulltimes), ylim = c(0.2, 60),
-    xlim = c(0, 8e+08), log = "y", ylab = "Processing Times (s)",
+  plot(cbind(unlist(fullvertxedges), fulltimes),
+    ylim = c(0.2, 60), xlim = c(0, 1.4e+09), log = "y",
+    ylab = "Processing Times (s)",
     xlab = "Landscape graph vertices x edges", 
     main = paste0(nrow(coordmat), " starting nodes"))
   points(cbind(vertxedges, times), col = "red")
