@@ -28,7 +28,7 @@ impute_na <- function(result, csurf, graph, warn = TRUE){
   
   if(length(ncross)<2){
     if(warn==TRUE){
-    warning("No cells found needing to impute.")
+      warning("No cells found needing to impute. Check that scoords exist in graph and re-run.")
     }
     result
   }else{

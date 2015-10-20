@@ -3,11 +3,11 @@
 #'@export
 #'@param dm matrix cost raster
 #'@param poicoords matrix
-#'@param grainprop numeric
-#'@param cutoff numeric between 0 and 1
-#'@param costsurf Raster
-#'@param scoord matrix 2 column
-#'@param snode numeric
+#'@param grainprop numeric proportion of cells to be included as "grain cells".
+#'@param cutoff numeric between 0 and 1. Determines the threshold at which a cell is determined "very important".
+#'@param costsurf Raster cost surface
+#'@param scoord matrix specifying starting coordinates. Must be 2 columns.
+#'@param snode numeric starting node
 #'@param irregular logical
 #'@param warn logical
 #'@description This high level function allows for generation of an accumulated cost surface from a single function call. 
@@ -25,9 +25,12 @@
 #'poicoords <- matrix(c(10.5, 10.5), ncol = 2)
 #'
 #'result <- irl_acc(dm, poicoords = poicoords, grainprop = 0.25,
-#' costsurf = costsurf, scoord = matrix(c(19.5, 0.5, 11.5, 11.5), ncol = 2, byrow = TRUE))
+#' costsurf = costsurf, scoord = matrix(c(19.5, 0.5, 11.5, 11.5),
+#' ncol = 2, byrow = TRUE))
+#'
 #'result <- irl_acc(dm, poicoords = poicoords, grainprop = 0.25,
-#' costsurf = costsurf, scoord = matrix(c(11.5, 11.5), ncol = 2, byrow = TRUE))
+#' costsurf = costsurf, scoord = matrix(c(11.5, 11.5),
+#' ncol = 2, byrow = TRUE))
 #'}
 
 irl_acc <- function(dm, poicoords = NA, cutoff = 0, grainprop = 0.25, costsurf, scoord, snode = NULL, irregular = TRUE, warn = TRUE){

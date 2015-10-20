@@ -12,15 +12,15 @@ irl_acc(dm, poicoords = NA, cutoff = 0, grainprop = 0.25, costsurf,
 
 \item{poicoords}{matrix}
 
-\item{cutoff}{numeric between 0 and 1}
+\item{cutoff}{numeric between 0 and 1. Determines the threshold at which a cell is determined "very important".}
 
-\item{grainprop}{numeric}
+\item{grainprop}{numeric proportion of cells to be included as "grain cells".}
 
-\item{costsurf}{Raster}
+\item{costsurf}{Raster cost surface}
 
-\item{scoord}{matrix 2 column}
+\item{scoord}{matrix specifying starting coordinates. Must be 2 columns.}
 
-\item{snode}{numeric}
+\item{snode}{numeric starting node}
 
 \item{irregular}{logical}
 
@@ -44,9 +44,12 @@ costsurf[] <- dm
 poicoords <- matrix(c(10.5, 10.5), ncol = 2)
 
 result <- irl_acc(dm, poicoords = poicoords, grainprop = 0.25,
-costsurf = costsurf, scoord = matrix(c(19.5, 0.5, 11.5, 11.5), ncol = 2, byrow = TRUE))
+costsurf = costsurf, scoord = matrix(c(19.5, 0.5, 11.5, 11.5),
+ncol = 2, byrow = TRUE))
+
 result <- irl_acc(dm, poicoords = poicoords, grainprop = 0.25,
-costsurf = costsurf, scoord = matrix(c(11.5, 11.5), ncol = 2, byrow = TRUE))
+costsurf = costsurf, scoord = matrix(c(11.5, 11.5),
+ncol = 2, byrow = TRUE))
 }
 }
 
