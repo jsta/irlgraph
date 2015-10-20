@@ -16,6 +16,9 @@ gdist_acc(costsurf, scoord = NULL, snode = NULL)
 \description{
 Generate an accumulated cost surface using a regular landscape graph and the gdistance transition class
 }
+\details{
+need to add ability to call gdistance::geoCorrection
+}
 \examples{
 dm <- as.matrix(read.delim(system.file("extdata/etherington20120code/cost-surface20x20.txt",
 package = "irlgraph"), skip = 6, na.strings = "-9999", header = FALSE, sep = " "))

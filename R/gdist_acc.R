@@ -3,6 +3,7 @@
 #'@param costsurf Raster
 #'@param scoord matrix 2 column
 #'@param snode numeric
+#'@details need to add ability to call gdistance::geoCorrection
 #'@importFrom gdistance transition transitionMatrix
 #'@importFrom igraph graph.adjacency shortest.paths E
 #'@importFrom Matrix cBind rBind
@@ -29,31 +30,36 @@
 gdist_acc <- function(costsurf, scoord = NULL, snode = NULL){
   
   gdist_acc_surf <- function(costsurf, scoord, snode){
-  ctrans <- gdistance::transition(costsurf, function(x) 1/mean(x), directions=8)
+    
+    scoord <- matrix(scoord, ncol = 2)
+    
+    ctrans <- gdistance::transition(costsurf, function(x) 1/mean(x), directions = 16)
+    ctrans <- gdistance::geoCorrection(ctrans, "c")
+    
+    if(is.null(snode) & all(is.null(scoord))){
+      stop("Must supply either a starting node or coordinates")
+    }
   
-  if(is.null(snode) & all(is.null(scoord))){
-    stop("Must supply either a starting node or coordinates")
-  }
+    if(is.null(snode)){
+      snode <- raster::cellFromXY(costsurf, scoord)
+    }
+    #print(paste("selected node number:", snode))
   
-  if(is.null(snode)){
-    snode <- raster::cellFromXY(costsurf, scoord)
-  }
-  
-  mtrans <- gdistance::transitionMatrix(ctrans)
-  mtrans <- Matrix::rBind(mtrans,rep(0, nrow(mtrans)))
-  mtrans <- Matrix::cBind(mtrans,rep(0, nrow(mtrans)))
-  
-  startNode <- nrow(mtrans) #extra node to serve as origin
-  adjP <- cbind(rep(startNode, times=length(snode)), snode)
-  mtrans[adjP] <- Inf
-  adjacencyGraph <- igraph::graph.adjacency(mtrans, mode="directed", weighted=TRUE)
-  
-  igraph::E(adjacencyGraph)$weight <- 1/igraph::E(adjacencyGraph)$weight		
-  shortestPaths <- igraph::shortest.paths(adjacencyGraph, v=startNode)[-startNode]
-  
-  result <- as(costsurf, "RasterLayer")
-  result <- raster::setValues(result, shortestPaths)	
-  list(result = result, graph = adjacencyGraph)
+    mtrans <- gdistance::transitionMatrix(ctrans)
+    mtrans <- Matrix::rBind(mtrans,rep(0, nrow(mtrans)))
+    mtrans <- Matrix::cBind(mtrans,rep(0, nrow(mtrans)))
+    
+    startNode <- nrow(mtrans) #extra node to serve as origin
+    adjP <- cbind(rep(startNode, times=length(snode)), snode)
+    mtrans[adjP] <- Inf
+    adjacencyGraph <- igraph::graph.adjacency(mtrans, mode="directed", weighted=TRUE)
+    
+    igraph::E(adjacencyGraph)$weight <- 1/igraph::E(adjacencyGraph)$weight		
+    shortestPaths <- igraph::shortest.paths(adjacencyGraph, v=startNode)[-startNode]
+    
+    result <- as(costsurf, "RasterLayer")
+    result <- raster::setValues(result, shortestPaths)	
+    list(result = result, graph = adjacencyGraph)
   }
   
   lapply(1:nrow(scoord), function(x) gdist_acc_surf(costsurf = costsurf, scoord = scoord[x,], snode = snode))
