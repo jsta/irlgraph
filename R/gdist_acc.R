@@ -2,7 +2,8 @@
 #'@title Generate an accumulated cost surface using a regular landscape graph and the gdistance transition class
 #'@param costsurf Raster
 #'@param scoord matrix 2 column
-#'@param snode numeric
+#'@param snode numeric starting node number
+#'@param geocorrect logical use gdistance::geoCorrection() on transition matrix?
 #'@details need to add ability to call gdistance::geoCorrection
 #'@importFrom gdistance transition transitionMatrix
 #'@importFrom igraph graph.adjacency shortest.paths E
@@ -27,14 +28,17 @@
 #'sp::plot(result[[2]]$result)
 #'points(scoord[2,1], scoord[2,2])
 
-gdist_acc <- function(costsurf, scoord = NULL, snode = NULL){
+gdist_acc <- function(costsurf, scoord = NULL, snode = NULL, geocorrect = TRUE){
   
-  gdist_acc_surf <- function(costsurf, scoord, snode){
+  gdist_acc_surf <- function(costsurf, scoord, snode, geocorrect){
     
     scoord <- matrix(scoord, ncol = 2)
     
     ctrans <- gdistance::transition(costsurf, function(x) 1/mean(x), directions = 16)
-    ctrans <- gdistance::geoCorrection(ctrans, "c")
+
+    if(geocorrect == TRUE){
+      ctrans <- gdistance::geoCorrection(ctrans, "c")
+    }
     
     if(is.null(snode) & all(is.null(scoord))){
       stop("Must supply either a starting node or coordinates")
@@ -62,5 +66,5 @@ gdist_acc <- function(costsurf, scoord = NULL, snode = NULL){
     list(result = result, graph = adjacencyGraph)
   }
   
-  lapply(1:nrow(scoord), function(x) gdist_acc_surf(costsurf = costsurf, scoord = scoord[x,], snode = snode))
+  lapply(1:nrow(scoord), function(x) gdist_acc_surf(costsurf = costsurf, scoord = scoord[x,], snode = snode, geocorrect = geocorrect))
 }

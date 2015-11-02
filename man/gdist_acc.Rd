@@ -4,14 +4,16 @@
 \alias{gdist_acc}
 \title{Generate an accumulated cost surface using a regular landscape graph and the gdistance transition class}
 \usage{
-gdist_acc(costsurf, scoord = NULL, snode = NULL)
+gdist_acc(costsurf, scoord = NULL, snode = NULL, geocorrect = TRUE)
 }
 \arguments{
 \item{costsurf}{Raster}
 
 \item{scoord}{matrix 2 column}
 
-\item{snode}{numeric}
+\item{snode}{numeric starting node number}
+
+\item{geocorrect}{logical use gdistance::geoCorrection() on transition matrix?}
 }
 \description{
 Generate an accumulated cost surface using a regular landscape graph and the gdistance transition class

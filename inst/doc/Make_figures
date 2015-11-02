@@ -1,6 +1,10 @@
 all:
-	montage figure-1.png figure-2.png figure-3.png figure-4.png -tile 4x -gravity south -geometry +1+1 -bordercolor white -border 5x5 irl-construction.png
+	convert figure-2.png -crop x320+0+0 -gravity South -resize 320x310\! figure-2_c.png
+	convert figure-2_c.png -gravity South -extent 501x360 figure-2_p.png
+	montage figure-1.png figure-2_p.png -tile 2x -geometry +1+1 -bordercolor white -border 5x5 node-edge_selection.png
+	montage figure-3.png figure-4.png -gravity North -tile 2x -geometry +1+1 -bordercolor white -border 5x5 irl-construction.png
 	montage figure-5.png figure-6.png -tile 2x -gravity south -geometry +1+1 -bordercolor white -border 5x5 processing-speed.png
+
 
 
 
