@@ -1,5 +1,6 @@
 #'@name irl_graph
 #'@title Generate an irregular landscape graph
+#'@description Subset the nodes in a matrix of cost values based on user defined point-of-interest coordinates, a user-defined importance cutoff, and a randomly selected proportion of non-null cells. Generate a graph object from this subset using delaunay triangulation.
 #'@param dm matrix of 2d cost values
 #'@param poicoords matrix 2 column point-of-interest coordinates
 #'@param grainprop numeric proportion of cells selected as grain cells

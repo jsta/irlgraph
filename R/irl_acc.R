@@ -1,5 +1,6 @@
 #'@name irl_acc
 #'@title Generate an accumulated cost surface from an irregular landscape graph
+#'@description Wraps the irl_graph, acc_path, and irl_acc functions
 #'@export
 #'@param dm matrix 2d cost values
 #'@param poicoords matrix 2 column point-of-interest coordinates

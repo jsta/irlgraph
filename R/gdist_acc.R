@@ -1,5 +1,6 @@
 #'@name gdist_acc
 #'@title Generate an accumulated cost surface using a regular landscape graph and the gdistance transition class
+#'@description The igraph package is used to contruct a regular landscape graph and calculate the accumulated cost of movement from each starting coordinate to points in a cost raster. 
 #'@param costsurf Raster cost surface
 #'@param scoord matrix 2 column starting coordinate
 #'@param snode numeric starting node number

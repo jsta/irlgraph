@@ -7,12 +7,15 @@
 impute_na(result, csurf, graph, warn = TRUE)
 }
 \arguments{
-\item{result}{Raster}
+\item{result}{Raster output from acc_path}
 
 \item{csurf}{Raster cost surface}
 
 \item{graph}{igraph object}
 
 \item{warn}{logical print warnings?}
+}
+\description{
+The spatstat package is used to impute NA values in the intermediate irregular landscape graph output from acc_path
 }
 

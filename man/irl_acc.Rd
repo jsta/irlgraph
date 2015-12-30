@@ -27,6 +27,8 @@ irl_acc(dm, poicoords = NA, cutoff = 0, grainprop = 0.25, costsurf,
 \item{warn}{logical print warnings?}
 }
 \description{
+Wraps the irl_graph, acc_path, and irl_acc functions
+
 This high level function allows for generation of an accumulated cost surface from a single function call
 }
 \examples{

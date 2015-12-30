@@ -1,10 +1,11 @@
 #'@name impute_na
 #'@title Impute NA cells according to nearest neighbor
+#'@description The spatstat package is used to impute NA values in the intermediate irregular landscape graph output from acc_path 
 #'@export
 #'@importFrom spatstat as.ppp nncross
 #'@importFrom raster xyFromCell cellFromXY
 #'@param csurf Raster cost surface
-#'@param result Raster
+#'@param result Raster output from acc_path
 #'@param warn logical print warnings?
 #'@param graph igraph object
 

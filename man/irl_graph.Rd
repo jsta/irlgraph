@@ -18,6 +18,9 @@ irl_graph(dm, poicoords = NA, grainprop = 0.25, cutoff = 0,
 
 \item{irregular}{logical skip irregular node subsetting routine?}
 }
+\description{
+Subset the nodes in a matrix of cost values based on user defined point-of-interest coordinates, a user-defined importance cutoff, and a randomly selected proportion of non-null cells. Generate a graph object from this subset using delaunay triangulation.
+}
 \examples{
 \dontrun{
 

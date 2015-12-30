@@ -15,4 +15,7 @@ acc_path(graph, costsurf, snode = NULL, scoord = NULL)
 
 \item{scoord}{matrix 2 column starting coordinate}
 }
+\description{
+The shortest.paths function from the igraph package is applied to an igraph object and the results are coerced to a raster object.
+}
 

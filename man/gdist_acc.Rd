@@ -15,6 +15,9 @@ gdist_acc(costsurf, scoord = NULL, snode = NULL, geocorrect = TRUE)
 
 \item{geocorrect}{logical use gdistance::geoCorrection() on transition matrix?}
 }
+\description{
+The igraph package is used to contruct a regular landscape graph and calculate the accumulated cost of movement from each starting coordinate to points in a cost raster.
+}
 \examples{
 dm <- as.matrix(read.delim(system.file("extdata/etherington20120code/cost-surface20x20.txt",
 package = "irlgraph"), skip = 6, na.strings = "-9999", header = FALSE, sep = " "))
